@@ -198,6 +198,7 @@ while 1:
 
             # Post tweet with image
             post_result = api.update_status(status=tweet, media_ids=[media.media_id])
+            print("POSTED")
         except Exception:
             print(Exception)
 

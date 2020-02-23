@@ -2,6 +2,9 @@ import cv2
 import time
 import pigpio
 import tweepy
+import face_recognition
+import os
+
 
 # Constants
 SERVO_SPEED = 10
@@ -36,6 +39,24 @@ auth.set_access_token(
     twitter_auth_keys['access_token_secret']
 )
 api = tweepy.API(auth)
+
+# Face Compare
+path = "./Photos/"
+known_faces=[]
+names = {}
+last_index = 0
+try:
+    for index, image_name in enumerate(os.listdir(path)):
+        #filenam
+        #print(image_path)
+        person_image = face_recognition.load_image_file(path + image_name)
+        known_faces.append( face_recognition.face_encodings(person_image)[0])
+        filename = os.path.splitext(image_name)[0] # removes .jpg from name to store in dictionary
+        names[index] = filename
+        last_index += 1
+except IndexError:
+    print("I wasn't able to locate any faces in at least one of the images. Check the image files. Aborting...")
+    quit()
 
 def need_move_servo(face_x, face_width, img):
     face_center = face_x + (face_width/2)
@@ -95,14 +116,34 @@ while 1:
         break
     elif k == 32:
         # space bar pressed
+
         # Take Picture
         cv2.imwrite('upload.png', img)
+
+        # Check if face is in DB
+        unknown_image = face_recognition.load_image_file("upload.png")
+        unknown_face_encoding = face_recognition.face_encodings(unknown_image)[0]
+        # results is an array of True/False telling if the unknown face matched anyone in the known_faces array
+        results = face_recognition.compare_faces(known_faces, unknown_face_encoding)
+
+        if not True in results:
+            handle = input("What is your twitter handle: ")
+            image_name = handle + ".png"
+            os.System("cp upload.png ./Photos/" + image_name)
+            person_image = face_recognition.load_image_file(path + image_name)
+            known_faces.append(face_recognition.face_encodings(person_image)[0])
+            filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary
+            names[last_index] = filename
+            last_index += 1
+        else:
+            i = results.index(True)
+            handle = names[i]
 
         # Upload image
         media = api.media_upload("upload.png")
 
         # Post tweet with image
-        tweet = "Gander made a friend #hackcu"
+        tweet = "Gander made just befriended @" + handle
         post_result = api.update_status(status=tweet, media_ids=[media.media_id])
 
 # Close the window 

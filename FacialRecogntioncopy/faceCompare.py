@@ -13,14 +13,16 @@ import ntpath
 path = "./Photos/"
 known_faces=[]
 names = {}
+last_index = 0
 try:
     for index, image_name in enumerate(os.listdir(path)):
-        #filenam
+        #filename
         #print(image_path)
         person_image = face_recognition.load_image_file(path + image_name)
         known_faces.append( face_recognition.face_encodings(person_image)[0])
         filename = os.path.splitext(image_name)[0] # removes .jpg from name to store in dictionary
         names[index] = filename
+        last_index += 1
 except IndexError:
     print("I wasn't able to locate any faces in at least one of the images. Check the image files. Aborting...")
     quit()

@@ -70,6 +70,7 @@ last_index = 0
 # GUI
 top = Tk()
 top.geometry("400x250")
+top.title('New friend :)')
 handle_label = Label(top, text = "Handle").place(x = 30,y = 50)
 stringinput = StringVar()
 add_and_post = partial(add_and_post, top, stringinput)

@@ -1,37 +1,17 @@
-# from gpiozero import AngularServo
-# from time import sleep
-#
-# servo = AngularServo(12, min_angle=-42, max_angle=44)
-# while True:
-#     servo.min()
-#     sleep(1)
-#     servo.mid()
-#     sleep(1)
-#     servo.max()
-#     sleep(1)
-#     servo.angle = 40
-#     sleep(1)
-#     servo.angle = 20
-#     sleep(1)
-#     servo.angle = 0
-#     sleep(1)
-#     servo.angle = -20
-#     sleep(1)
-#     servo.angle = -40
+import pigpio
+from time import sleep
 
-"""
-Demonstration of how to control servo pulses with RPIO.PWM
-RPIO Documentation: http://pythonhosted.org/RPIO
-"""
-from RPIO import PWM
+# connect to the
+pi = pigpio.pi()
 
-servo = PWM.Servo()
+# loop forever
+while True:
 
-# Add servo pulse for GPIO 17 with 1200µs (1.2ms)
-servo.set_servo(18, 1200)
-
-# Add servo pulse for GPIO 17 with 2000µs (2.0ms)
-servo.set_servo(18, 2000)
-
-# Clear servo on GPIO17
-servo.stop_servo(18)
+    pi.set_servo_pulsewidth(18, 0)    # off
+    sleep(1)
+    pi.set_servo_pulsewidth(18, 1000) # position anti-clockwise
+    sleep(1)
+    pi.set_servo_pulsewidth(18, 1500) # middle
+    sleep(1)
+    pi.set_servo_pulsewidth(18, 2000) # position clockwise
+    sleep(1)

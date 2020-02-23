@@ -1,6 +1,6 @@
 import cv2
 import time
-from gpiozero import AngularServo
+import pigpio
 
 # load data sets
 face_cascade = cv2.CascadeClassifier('/home/pi/Desktop/env/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml')
@@ -8,10 +8,12 @@ face_cascade = cv2.CascadeClassifier('/home/pi/Desktop/env/lib/python3.7/site-pa
 # capture frames from a camera 
 cap = cv2.VideoCapture(1)
 
-# init the servo and i/o
-servo = AngularServo(18, min_angle=-42, max_angle=44)
-position = 0.0
-servo.angle = position
+# connect to the
+pi = pigpio.pi()
+
+# set to middle
+position = 1500
+pi.set_servo_pulsewidth(18, position) # middle
 
 def need_move_servo(face_x, face_width, img):
     face_center = face_x + (face_width/2)
@@ -46,12 +48,12 @@ while 1:
 
         # move servo
         move = need_move_servo(x, w, img)
-        if move == -1 and position >= -40:
-            position -= 0.01
-            servo.angle = position
-        elif move == 1 and position <= 40:
-            position += 0.01
-            servo.angle = position
+        if move == -1 and position > 1000:
+            position -= 1
+            pi.set_servo_pulsewidth(18, position)
+        elif move == 1 and position < 2000:
+            position += 1
+            pi.set_servo_pulsewidth(18, position)
 
 
     height = img.shape[0]

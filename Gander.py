@@ -130,7 +130,7 @@ while 1:
             input_good = False
             while input_good == False:
                 handle = input("What is your twitter handle: ")
-                if " " not in handle and "@" not in handle:
+                if " " not in handle and "@" not in handle and handle != "":
                     input_good = True
             image_name = handle + ".png"
             os.system("cp upload.png ./Photos/" + image_name)
@@ -139,15 +139,16 @@ while 1:
             filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary
             names[last_index] = filename
             last_index += 1
+            tweet = "Gander just befriended @" + handle
         else:
             i = results.index(True)
             handle = names[i]
+            tweet = "Gander just saw his friend @" + handle
 
         # Upload image
         media = api.media_upload("upload.png")
 
         # Post tweet with image
-        tweet = "Gander made just befriended @" + handle
         post_result = api.update_status(status=tweet, media_ids=[media.media_id])
 
 # Close the window 

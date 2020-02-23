@@ -49,10 +49,10 @@ while 1:
         # move servo
         move = need_move_servo(x, w, img)
         if move == 1 and position > 1010:
-            position -= 20
+            position -= 10
             pi.set_servo_pulsewidth(18, position)
         elif move == -1 and position < 2010:
-            position += 20
+            position += 10
             pi.set_servo_pulsewidth(18, position)
 
         break

@@ -26,11 +26,14 @@ pi = pigpio.pi()
 position = 1500
 pi.set_servo_pulsewidth(18, position) # middle
 
+# need_move_servo calculates whether the camera needs to be adjusted based off of the vision data
 def need_move_servo(face_x, face_width, img):
+    # get the centers
     face_center = face_x + (face_width/2)
     img_center = img.shape[1] / 2
     THRESHOLD = face_width/4
 
+    # check the locations relative to the threshold
     if img_center - face_center > THRESHOLD:
         return -1
     elif face_center - img_center > THRESHOLD:
@@ -38,7 +41,9 @@ def need_move_servo(face_x, face_width, img):
     else:
         return 0
 
+# add_and_post is called when a new friend is submitted
 def add_and_post(tk, text):
+    # close the window
     tk.destroy()
 
 
@@ -76,6 +81,7 @@ add_and_post = partial(add_and_post, top, stringinput)
 sbmitbtn = Button(top, text = "Submit", command = add_and_post, activebackground = "pink", activeforeground = "blue").place(x = 30, y = 170)
 e1 = Entry(top, textvariable=stringinput).place(x = 80, y = 50)
 
+# init the facecompare
 try:
     for index, image_name in enumerate(os.listdir(path)):
         #filename
@@ -156,25 +162,34 @@ while 1:
         # results is an array of True/False telling if the unknown face matched anyone in the known_faces array
         results = face_recognition.compare_faces(known_faces, unknown_face_encoding)
 
+        # if we have a new friend
         if not True in results:
             input_good = False
             while input_good == False:
+                # get the new friend's handle
                 top.mainloop()
                 handle = stringinput.get()
                 print(handle)
+                # check and make sure it is a good handle
                 if " " not in handle and "@" not in handle and "#" not in handle and handle != "":
                     input_good = True
+            # Make the name of the image to be the friend's handle
             image_name = handle + ".png"
+            # copy over into the photo DB
             os.system("cp crop.png ./Photos/" + image_name)
+            # Add the face to the facecompare
             person_image = face_recognition.load_image_file(path + image_name)
             known_faces.append(face_recognition.face_encodings(person_image)[0])
             filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary
             names[last_index] = filename
             last_index += 1
+            # generate the caption
             tweet = "Gander just befriended @" + handle + " at #HackCU"
         else:
+            # get the first name that matches the face
             i = results.index(True)
             handle = names[i]
+            # generate the caption
             tweet = "Gander just saw his friend @" + handle + " at #HackCU"
 
         # Upload image

@@ -72,9 +72,9 @@ top = Tk()
 top.geometry("400x250")
 handle_label = Label(top, text = "Handle").place(x = 30,y = 50)
 stringinput = StringVar()
-sbmitbtn = Button(top, text = "Submit",activebackground = "pink", activeforeground = "blue").place(x = 30, y = 170)
+add_and_post = partial(add_and_post, top, stringinput)
+sbmitbtn = Button(top, text = "Submit", command = add_and_post, activebackground = "pink", activeforeground = "blue").place(x = 30, y = 170)
 e1 = Entry(top, textvariable=stringinput).place(x = 80, y = 50)
-add_and_post = partial(top, stringinput)
 
 try:
     for index, image_name in enumerate(os.listdir(path)):

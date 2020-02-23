@@ -3,7 +3,7 @@ import time
 import RPi.GPIO
 
 # load data sets
-face_cascade = cv2.CascadeClassifier('C:\\Users\\rocke\\Documents\\School\\Fall 2109\\Comp Linear\\PythonProject\\venv\\Lib\\site-packages\\cv2\\data\\haarcascade_frontalface_default.xml')
+face_cascade = cv2.CascadeClassifier('/home/pi/Desktop/env/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml')
 
 # capture frames from a camera 
 cap = cv2.VideoCapture(0)
@@ -15,7 +15,9 @@ GPIO.setup(12, GPIO.OUT)
 
 p = GPIO.PWM(12, 50)
 
-p.start(7.5)
+position = 7.5
+p.start(position)
+
 
 def need_move_servo(face_x, face_width, img):
     face_center = face_x + (face_width/2)
@@ -49,6 +51,13 @@ while 1:
         print("face_center: " + str(x + (w/ 2)) + " img_center: " + str(img.shape[1]/2) + " Servo command: " + str(need_move_servo(x, w, img)))
 
         # move servo
+        move = need_move_servo(x, w, img)
+        if move == -1 && position >= 2.5:
+            position -= 0.1
+            p.ChangeDutyCycle(position)
+        elif move == 1 && position <= 12.5:
+            position += .01
+            p.ChangeDutyCycle(position)
 
 
     height = img.shape[0]

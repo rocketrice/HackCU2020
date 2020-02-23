@@ -130,7 +130,7 @@ while 1:
             input_good = False
             while input_good == False:
                 handle = input("What is your twitter handle: ")
-                if not " " in handle:
+                if " " not in handle and "@" not in handle:
                     input_good = True
             image_name = handle + ".png"
             os.system("cp upload.png ./Photos/" + image_name)

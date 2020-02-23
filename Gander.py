@@ -145,7 +145,11 @@ while 1:
 
         # Take Pictures
         cv2.imwrite('upload.png', img)
-        cv2.imwrite('crop.png', img.crop(face_cords[0], face_cords[1], face_cords[2], face_cords[3]))
+        x = face_cords[0]
+        y = face_cords[1]
+        w = face_cords[2]
+        h = face_cords[3]
+        cv2.imwrite('crop.png', img[y:y+h, x:x+w])
 
         # Check if face is in DB
         unknown_image = face_recognition.load_image_file("crop.png")

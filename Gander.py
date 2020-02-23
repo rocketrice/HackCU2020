@@ -1,6 +1,6 @@
 import cv2
 import time
-import RPi.GPIO
+import RPi.GPIO as GPIO
 
 # load data sets
 face_cascade = cv2.CascadeClassifier('/home/pi/Desktop/env/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml')

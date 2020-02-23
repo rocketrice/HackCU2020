@@ -87,7 +87,7 @@ try:
         #filename
         #print(image_path)
         person_image = face_recognition.load_image_file(path + image_name)
-        known_faces.append( face_recognition.face_encodings(person_image)[0])
+        known_faces.append(face_recognition.face_encodings(person_image)[0])
         filename = os.path.splitext(image_name)[0] # removes .jpg from name to store in dictionary
         names[index] = filename
         last_index += 1
@@ -156,47 +156,50 @@ while 1:
         h = face_cords[3]
         cv2.imwrite('crop.png', img[y:y+h, x:x+w])
 
-        # Check if face is in DB
-        unknown_image = face_recognition.load_image_file("crop.png")
-        unknown_face_encoding = face_recognition.face_encodings(unknown_image)[0]
-        # results is an array of True/False telling if the unknown face matched anyone in the known_faces array
-        results = face_recognition.compare_faces(known_faces, unknown_face_encoding)
+        try:
+            # Check if face is in DB
+            unknown_image = face_recognition.load_image_file("crop.png")
+            unknown_face_encoding = face_recognition.face_encodings(unknown_image)[0]
+            # results is an array of True/False telling if the unknown face matched anyone in the known_faces array
+            results = face_recognition.compare_faces(known_faces, unknown_face_encoding)
 
-        # if we have a new friend
-        if not True in results:
-            input_good = False
-            while input_good == False:
-                # get the new friend's handle
-                top.mainloop()
-                handle = stringinput.get()
-                print(handle)
-                # check and make sure it is a good handle
-                if " " not in handle and "@" not in handle and "#" not in handle and handle != "":
-                    input_good = True
-            # Make the name of the image to be the friend's handle
-            image_name = handle + ".png"
-            # copy over into the photo DB
-            os.system("cp crop.png ./Photos/" + image_name)
-            # Add the face to the facecompare
-            person_image = face_recognition.load_image_file(path + image_name)
-            known_faces.append(face_recognition.face_encodings(person_image)[0])
-            filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary
-            names[last_index] = filename
-            last_index += 1
-            # generate the caption
-            tweet = "Gander just befriended @" + handle + " at #HackCU"
-        else:
-            # get the first name that matches the face
-            i = results.index(True)
-            handle = names[i]
-            # generate the caption
-            tweet = "Gander just saw his friend @" + handle + " at #HackCU"
+            # if we have a new friend
+            if not True in results:
+                input_good = False
+                while input_good == False:
+                    # get the new friend's handle
+                    top.mainloop()
+                    handle = stringinput.get()
+                    print(handle)
+                    # check and make sure it is a good handle
+                    if " " not in handle and "@" not in handle and "#" not in handle and handle != "":
+                        input_good = True
+                # Make the name of the image to be the friend's handle
+                image_name = handle + ".png"
+                # copy over into the photo DB
+                os.system("cp crop.png ./Photos/" + image_name)
+                # Add the face to the facecompare
+                person_image = face_recognition.load_image_file(path + image_name)
+                known_faces.append(face_recognition.face_encodings(person_image)[0])
+                filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary
+                names[last_index] = filename
+                last_index += 1
+                # generate the caption
+                tweet = "Gander just befriended @" + handle + " at #HackCU"
+            else:
+                # get the first name that matches the face
+                i = results.index(True)
+                handle = names[i]
+                # generate the caption
+                tweet = "Gander just saw his friend @" + handle + " at #HackCU"
 
-        # Upload image
-        media = api.media_upload("upload.png")
+            # Upload image
+            media = api.media_upload("upload.png")
 
-        # Post tweet with image
-        post_result = api.update_status(status=tweet, media_ids=[media.media_id])
+            # Post tweet with image
+            post_result = api.update_status(status=tweet, media_ids=[media.media_id])
+        except Exception:
+            print(Exception)
 
 # Close the window 
 cap.release()

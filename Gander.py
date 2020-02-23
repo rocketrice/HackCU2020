@@ -171,11 +171,11 @@ while 1:
             filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary
             names[last_index] = filename
             last_index += 1
-            tweet = "Gander just befriended @" + handle
+            tweet = "Gander just befriended @" + handle + " at #HackCU"
         else:
             i = results.index(True)
             handle = names[i]
-            tweet = "Gander just saw his friend @" + handle
+            tweet = "Gander just saw his friend @" + handle + " at #HackCU"
 
         # Upload image
         media = api.media_upload("upload.png")

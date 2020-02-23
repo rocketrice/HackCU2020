@@ -17,6 +17,7 @@ p = GPIO.PWM(12, 50)
 
 position = 7.5
 p.start(position)
+p.stop()
 
 
 def need_move_servo(face_x, face_width, img):
@@ -51,16 +52,14 @@ while 1:
         print("face_center: " + str(x + (w/ 2)) + " img_center: " + str(img.shape[1]/2) + " Servo command: " + str(need_move_servo(x, w, img)))
 
         # move servo
-        # move = need_move_servo(x, w, img)
-        # if move == -1 and position >= 2.5:
-        #     position -= 0.0001
-        #     p.ChangeDutyCycle(position)
-        #     time.sleep(1)
-        # elif move == 1 and position <= 12.5:
-        #     position += 0.0001
-        #     p.ChangeDutyCycle(position)
-        #     time.sleep(1)
-
+        move = need_move_servo(x, w, img)
+        if move == -1 and position >= 2.5:
+            position -= 0.0001
+            p.start(position)
+        elif move == 1 and position <= 12.5:
+            position += 0.0001
+            p.start(position)
+        p.stop()
 
 
     height = img.shape[0]

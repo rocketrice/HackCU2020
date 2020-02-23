@@ -6,7 +6,7 @@ import RPi.GPIO
 face_cascade = cv2.CascadeClassifier('/home/pi/Desktop/env/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml')
 
 # capture frames from a camera 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # init the servo and i/o
 GPIO.setmode(GPIO.BOARD)

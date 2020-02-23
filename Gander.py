@@ -1,4 +1,6 @@
 import cv2
+import time
+import RPi.GPIO
 
 # load data sets
 face_cascade = cv2.CascadeClassifier('C:\\Users\\rocke\\Documents\\School\\Fall 2109\\Comp Linear\\PythonProject\\venv\\Lib\\site-packages\\cv2\\data\\haarcascade_frontalface_default.xml')
@@ -6,6 +8,14 @@ face_cascade = cv2.CascadeClassifier('C:\\Users\\rocke\\Documents\\School\\Fall 
 # capture frames from a camera 
 cap = cv2.VideoCapture(0)
 
+# init the servo and i/o
+GPIO.setmode(GPIO.BOARD)
+
+GPIO.setup(12, GPIO.OUT)
+
+p = GPIO.PWM(12, 50)
+
+p.start(7.5)
 
 def need_move_servo(face_x, face_width, img):
     face_center = face_x + (face_width/2)
@@ -37,6 +47,9 @@ while 1:
         roi_gray = gray[y:y + h, x:x + w]
         roi_color = img[y:y + h, x:x + w]
         print("face_center: " + str(x + (w/ 2)) + " img_center: " + str(img.shape[1]/2) + " Servo command: " + str(need_move_servo(x, w, img)))
+
+        # move servo
+
 
     height = img.shape[0]
     width = img.shape[1]

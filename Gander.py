@@ -53,11 +53,14 @@ while 1:
         # move servo
         move = need_move_servo(x, w, img)
         if move == -1 and position >= 2.5:
-            position -= 0.1
+            position -= 0.01
             p.ChangeDutyCycle(position)
         elif move == 1 and position <= 12.5:
             position += .01
             p.ChangeDutyCycle(position)
+        else:
+            p.ChangeDutyCycle(position)
+
 
 
     height = img.shape[0]
@@ -79,3 +82,5 @@ cap.release()
 # De-allocate any associated memory usage 
 cv2.destroyAllWindows()
 
+p.stop()
+GPIO.cleanup()

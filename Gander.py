@@ -53,10 +53,10 @@ while 1:
         # move servo
         move = need_move_servo(x, w, img)
         if move == -1 and position >= 2.5:
-            position -= 0.01
+            position -= 0.0001
             p.ChangeDutyCycle(position)
         elif move == 1 and position <= 12.5:
-            position += .01
+            position += 0.0001
             p.ChangeDutyCycle(position)
         else:
             p.ChangeDutyCycle(position)

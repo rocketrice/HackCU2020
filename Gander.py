@@ -1,5 +1,5 @@
 import cv2
-import numpy as np
+import time
 import pigpio
 import tweepy
 import face_recognition
@@ -40,30 +40,6 @@ def need_move_servo(face_x, face_width, img):
 
 def add_and_post(tk, text):
     tk.destroy()
-
-
-# function to overlay a transparent image on backround.
-def transparentOverlay(src, overlay, pos=(0, 0), scale=1):
-    """
-    :param src: Input Color Background Image
-    :param overlay: transparent Image (BGRA)
-    :param pos:  position where the image to be blit.
-    :param scale : scale factor of transparent image.
-    :return: Resultant Image
-    """
-    overlay = cv2.resize(overlay, (0, 0), fx=scale, fy=scale)
-    h, w, _ = overlay.shape  # Size of pngImg
-    rows, cols, _ = src.shape  # Size of background Image
-    y, x = pos[0], pos[1]  # Position of PngImage
-
-    # loop over all pixels and apply the blending equation
-    for i in range(h):
-        for j in range(w):
-            if x + i >= rows or y + j >= cols:
-                continue
-            alpha = float(overlay[i][j][3] / 255.0)  # read the alpha channel
-            src[x + i][y + j] = alpha * overlay[i][j][:3] + (1 - alpha) * src[x + i][y + j]
-    return src
 
 
 # Twitter API
@@ -202,22 +178,7 @@ while 1:
             tweet = "Gander just saw his friend @" + handle
 
         # Upload image
-
-
-        """ ----------- Read all images --------------------"""
-        bImg = cv2.imread("upload.png")
-        bImg = cv2.resize(bImg, (2100, 1178))
-        # KeyPoint : Remember to use cv2.IMREAD_UNCHANGED flag to load the image with alpha channel
-        pngImage = cv2.imread("overlay.png", cv2.IMREAD_UNCHANGED)
-        pngImage = cv2.resize(pngImage, (2100, 1178))
-        # Overlay transparent images at desired postion(x,y) and Scale.
-        result = transparentOverlay(bImg, pngImage, (0, 0), 1)
-        # result = transparentOverlay(bImg,logoImage,(0,0),1)
-
-        # Display the result
-        cv2.imwrite('result.png', result)
-        # cv2.destroyAllWindows()
-        media = api.media_upload("result.png")
+        media = api.media_upload("upload.png")
 
         # Post tweet with image
         post_result = api.update_status(status=tweet, media_ids=[media.media_id])

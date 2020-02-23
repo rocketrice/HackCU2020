@@ -57,12 +57,10 @@ while 1:
         if move == -1 and position >= 2.5:
             position -= 0.0001
             p.start(position)
-            time.sleep(1)
             p.stop()
         elif move == 1 and position <= 12.5:
             position += 0.0001
             p.start(position)
-            time.sleep(1)
             p.stop()
 
 

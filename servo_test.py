@@ -1,22 +1,20 @@
-import RPi.GPIO as GPIO
-import time
+from gpiozero import AngularServo
+from time import sleep
 
-GPIO.setmode(GPIO.BOARD)
-
-GPIO.setup(12, GPIO.OUT)
-
-p = GPIO.PWM(12, 50)
-
-p.start(7.5)
-
-try:
-    while True:
-        p.ChangeDutyCycle(7.5)  # turn towards 90 degree
-        time.sleep(1) # sleep 1 second
-        p.ChangeDutyCycle(2.5)  # turn towards 0 degree
-        time.sleep(1) # sleep 1 second
-        p.ChangeDutyCycle(12.5) # turn towards 180 degree
-        time.sleep(1) # sleep 1 second
-except KeyboardInterrupt:
-    p.stop()
-    GPIO.cleanup()
+servo = AngularServo(12, min_angle=-42, max_angle=44)
+while True:
+    servo.min()
+    sleep(1)
+    servo.mid()
+    sleep(1)
+    servo.max()
+    sleep(1)
+    servo.angle = 40
+    sleep(1)
+    servo.angle = 20
+    sleep(1)
+    servo.angle = 0
+    sleep(1)
+    servo.angle = -20
+    sleep(1)
+    servo.angle = -40

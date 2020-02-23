@@ -129,7 +129,7 @@ while 1:
         if not True in results:
             handle = input("What is your twitter handle: ")
             image_name = handle + ".png"
-            os.System("cp upload.png ./Photos/" + image_name)
+            os.system("cp upload.png ./Photos/" + image_name)
             person_image = face_recognition.load_image_file(path + image_name)
             known_faces.append(face_recognition.face_encodings(person_image)[0])
             filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary

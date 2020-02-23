@@ -39,8 +39,7 @@ def need_move_servo(face_x, face_width, img):
         return 0
 
 def add_and_post(tk, text):
-    handle_input = text.get()
-    tk.destroy
+    tk.destroy()
 
 
 # Twitter API
@@ -161,7 +160,8 @@ while 1:
             input_good = False
             while input_good == False:
                 top.mainloop()
-                handle = handle_input
+                handle = stringinput.get()
+                print(handle)
                 if " " not in handle and "@" not in handle and "#" not in handle and handle != "":
                     input_good = True
             image_name = handle + ".png"

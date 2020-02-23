@@ -114,8 +114,8 @@ while 1:
     if k == 27:
         # escape pressed
         break
-    elif k == 32:
-        # space bar pressed
+    elif k == 8:
+        # back space pressed
 
         # Take Picture
         cv2.imwrite('upload.png', img)
@@ -127,7 +127,11 @@ while 1:
         results = face_recognition.compare_faces(known_faces, unknown_face_encoding)
 
         if not True in results:
-            handle = input("What is your twitter handle: ")
+            input_good = False
+            while input_good == False:
+                handle = input("What is your twitter handle: ")
+                if not " " in handle:
+                    input_good = True
             image_name = handle + ".png"
             os.system("cp upload.png ./Photos/" + image_name)
             person_image = face_recognition.load_image_file(path + image_name)

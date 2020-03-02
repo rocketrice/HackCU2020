@@ -68,7 +68,7 @@ api = tweepy.API(auth)
 # Face Compare
 path = "./Photos/"
 known_face_encodings=[]
-known_face_names = {}
+process_this_frame = True
 last_index = 0
 
 # GUI

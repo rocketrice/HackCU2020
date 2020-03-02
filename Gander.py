@@ -67,8 +67,8 @@ api = tweepy.API(auth)
 
 # Face Compare
 path = "./Photos/"
-known_faces=[]
-names = {}
+known_face_encodings=[]
+known_face_names = {}
 last_index = 0
 
 # GUI
@@ -87,58 +87,85 @@ try:
         #filename
         #print(image_path)
         person_image = face_recognition.load_image_file(path + image_name)
-        known_faces.append(face_recognition.face_encodings(person_image)[0])
+        known_face_encodings.append(face_recognition.face_encodings(person_image)[0])
         filename = os.path.splitext(image_name)[0] # removes .jpg from name to store in dictionary
-        names[index] = filename
+        known_face_names[index] = filename
         last_index += 1
 except IndexError:
     print("I wasn't able to locate any faces in at least one of the images. Check the image files. Aborting...")
     quit()
 
-# loop runs if capturing has been initialized. 
-while 1:
+while True:
+    # Grab a single frame of video
+    ret, frame = cap.read()
 
-    # reads frames from a camera 
-    ret, img = cap.read()
+    # Resize frame of video to 1/4 size for faster face recognition processing
+    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 
-    # convert to gray scale of each frames 
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+    rgb_small_frame = small_frame[:, :, ::-1]
 
-    # Detects faces of different sizes in the input image 
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    face_cords = [0,0,0,0]
+    # Only process every other frame of video to save time
+    if process_this_frame:
+        # Find all the faces and face encodings in the current frame of video
+        face_locations = face_recognition.face_locations(rgb_small_frame)
+        face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
-    for (x, y, w, h) in faces:
-        # Save cords
-        face_cords[0] = x
-        face_cords[1] = y
-        face_cords[2] = w
-        face_cords[3] = h
-        # To draw a rectangle in a face  
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-        roi_gray = gray[y:y + h, x:x + w]
-        roi_color = img[y:y + h, x:x + w]
-        #print("face_center: " + str(x + (w/ 2)) + " img_center: " + str(img.shape[1]/2) + " Servo command: " + str(need_move_servo(x, w, img)))
+        face_names = []
+        for face_encoding in face_encodings:
+            # See if the face is a match for the known face(s)
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+            name = "Unknown"
 
-        # move servo
-        move = need_move_servo(x, w, img)
-        if move == 1 and position > 1010:
-            position -= SERVO_SPEED
-            pi.set_servo_pulsewidth(18, position)
-        elif move == -1 and position < 2010:
-            position += SERVO_SPEED
-            pi.set_servo_pulsewidth(18, position)
+            # # If a match was found in known_face_encodings, just use the first one.
+            # if True in matches:
+            #     first_match_index = matches.index(True)
+            #     name = known_face_names[first_match_index]
 
-        break
+            # Or instead, use the known face with the smallest distance to the new face
+            face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+            best_match_index = np.argmin(face_distances)
+            if matches[best_match_index]:
+                name = known_face_names[best_match_index]
+
+            face_names.append(name)
+
+    process_this_frame = not process_this_frame
 
 
-    height = img.shape[0]
-    width = img.shape[1]
-    # draw target line
-    #cv2.line(img, (int(width / 2), 0), (int(width / 2), height), (255, 0, 0), 2)
+    # Display the results
+    for (top, right, bottom, left), name in zip(face_locations, face_names):
+        # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+        top *= 4
+        right *= 4
+        bottom *= 4
+        left *= 4
 
-    #display image
-    cv2.imshow('img', img)
+        # Draw a box around the face
+        cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+
+        # Draw a label with a name below the face
+        cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+        font = cv2.FONT_HERSHEY_DUPLEX
+        cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+
+    # Display the resulting image
+    cv2.imshow('Video', frame)
+    (t,r,b,l) = face_locations[0]
+    x = l
+    w = r - l
+    # move servo
+    move = need_move_servo(x, w, img)
+    if move == 1 and position > 1010:
+        position -= SERVO_SPEED
+        pi.set_servo_pulsewidth(18, position)
+    elif move == -1 and position < 2010:
+        position += SERVO_SPEED
+        pi.set_servo_pulsewidth(18, position)
+
+    break
+
+
 
     # Wait for Esc key to stop 
     k = cv2.waitKey(30) & 0xff
@@ -161,7 +188,7 @@ while 1:
             unknown_image = face_recognition.load_image_file("crop.png")
             unknown_face_encoding = face_recognition.face_encodings(unknown_image)[0]
             # results is an array of True/False telling if the unknown face matched anyone in the known_faces array
-            results = face_recognition.compare_faces(known_faces, unknown_face_encoding)
+            results = face_recognition.compare_faces(known_face_encodings, unknown_face_encoding)
 
             # if we have a new friend
             if not True in results:
@@ -180,16 +207,16 @@ while 1:
                 os.system("cp crop.png ./Photos/" + image_name)
                 # Add the face to the facecompare
                 person_image = face_recognition.load_image_file(path + image_name)
-                known_faces.append(face_recognition.face_encodings(person_image)[0])
+                known_face_encodings.append(face_recognition.face_encodings(person_image)[0])
                 filename = os.path.splitext(image_name)[0]  # removes .jpg from name to store in dictionary
-                names[last_index] = filename
+                known_face_names[last_index] = filename
                 last_index += 1
                 # generate the caption
                 tweet = "Gander just befriended @" + handle + " at #HackCU"
             else:
                 # get the first name that matches the face
                 i = results.index(True)
-                handle = names[i]
+                handle = known_face_names[i]
                 # generate the caption
                 tweet = "Gander just saw his friend @" + handle + " at #HackCU"
 

@@ -150,9 +150,11 @@ while True:
         font = cv2.FONT_HERSHEY_DUPLEX
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
+    cv2.imshow('Video', frame)
+
     # Display the resulting image
     if len(face_locations) >= 1:
-        cv2.imshow('Video', frame)
+
         (t,r,b,l) = face_locations[0]
         x = l
         w = r - l

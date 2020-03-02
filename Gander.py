@@ -151,20 +151,21 @@ while True:
         cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
     # Display the resulting image
-    cv2.imshow('Video', frame)
-    (t,r,b,l) = face_locations[0]
-    x = l
-    w = r - l
-    # move servo
-    move = need_move_servo(x, w, img)
-    if move == 1 and position > 1010:
-        position -= SERVO_SPEED
-        pi.set_servo_pulsewidth(18, position)
-    elif move == -1 and position < 2010:
-        position += SERVO_SPEED
-        pi.set_servo_pulsewidth(18, position)
+    if len(face_locations) >= 1:
+        cv2.imshow('Video', frame)
+        (t,r,b,l) = face_locations[0]
+        x = l
+        w = r - l
+        # move servo
+        move = need_move_servo(x, w, img)
+        if move == 1 and position > 1010:
+            position -= SERVO_SPEED
+            pi.set_servo_pulsewidth(18, position)
+        elif move == -1 and position < 2010:
+            position += SERVO_SPEED
+            pi.set_servo_pulsewidth(18, position)
 
-    break
+        break
 
 
 

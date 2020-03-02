@@ -160,7 +160,7 @@ while True:
         x = l
         w = r - l
         # move servo
-        move = need_move_servo(x, w, img)
+        move = need_move_servo(x, w, frame)
         if move == 1 and position > 1010:
             position -= SERVO_SPEED
             pi.set_servo_pulsewidth(18, position)
@@ -177,16 +177,13 @@ while True:
     if k == 27:
         # escape pressed
         break
-    elif k == 8 and len(faces) > 0:
+    elif k == 8 and len(face_locations) > 0:
         # back space pressed
 
         # Take Pictures
-        cv2.imwrite('upload.png', img)
-        x = face_cords[0]
-        y = face_cords[1]
-        w = face_cords[2]
-        h = face_cords[3]
-        cv2.imwrite('crop.png', img[y:y+h, x:x+w])
+        cv2.imwrite('upload.png', frame)
+        (t,r,b,l) = face_locations[0]
+        cv2.imwrite('crop.png', frame[t:b, l:r])
 
         try:
             # Check if face is in DB

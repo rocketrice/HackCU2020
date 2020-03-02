@@ -168,8 +168,6 @@ while True:
             position += SERVO_SPEED
             pi.set_servo_pulsewidth(18, position)
 
-        break
-
 
 
     # Wait for Esc key to stop 
